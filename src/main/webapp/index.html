@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Vue基础教程_唯实讲堂_www.ForTen.org</title>
+</head>
+<body>
+<div id="show">
+    <ul>
+        <li v-for="s in allData">{{s.name}}</li>
+    </ul>
+
+    <form>
+        <input v-model="si.id" /><br>
+        <input v-model="si.name" /><br>
+        <input v-model="si.age" /><br>
+        <input v-model="si.gender" /><br>
+        <button type="button" @click="save">保存</button>
+    </form>
+
+    <form>
+        <input v-model="delId" /><br>
+        <button type="button" @click="delStudent">删除</button>
+    </form>
+
+    <!--
+        因为使用传统的表单提交方式时，浏览器只支持GET和POST两种方式
+        所以当调用REST资源时，如果不是以上两种请求方法，则应该
+        使用<input type="hidden" name="_method" value="方法名称" />
+        配合过滤器进行请求方式的转换
+
+        使用axios进行AJAX请求时，可直接使用其它请求方法名
+    -->
+    <form action="/student/1" method="POST">
+        <input type="hidden" name="_method" value="DELETE" />
+        <button>删除</button>
+    </form>
+
+    <form>
+        <input v-model="msi.id" /><br>
+        <input v-model="msi.name" /><br>
+        <input v-model="msi.age" /><br>
+        <input v-model="msi.gender" /><br>
+        <button type="button" @click="update">修改</button>
+    </form>
+    <form action="/student" method="POST">
+        <input type="hidden" name="_method" value="PUT" />
+        <input value="2" name="id" /><br>
+        <input value="Mary" name="name" /><br>
+        <input value="30" name="age" /><br>
+        <input value="F" name="gender" /><br>
+        <button>修改</button>
+    </form>
+</div>
+<script src="js/jquery-3.2.1.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/axios.js"></script>
+<script>
+    var vm = new Vue({
+        el:'#show',
+        data:{
+            allData:[],
+            si:{},
+            delId:0,
+            msi:{"id":2, "name":"Mary", "age":30, "gender":"F"}
+        },methods:{
+            save:function(){
+                axios({
+                    url:'/student',
+                    method:"POST",
+                    data:this.si
+                }).then((res)=>{
+                    alert(res.data.msg);
+                });
+            },
+            delStudent:function(){
+                axios({
+                    url:'/student/'+this.delId,
+                    method:"DELETE"
+                }).then((res)=>{
+                    alert(res.data.msg);
+                });
+            },
+            update:function(){
+                axios({
+                    url:'/student',
+                    method:"PUT",
+                    data:this.msi
+                }).then((res)=>{
+                    alert(res.data.msg);
+                });
+            }
+        },created:function(){
+            axios({
+                url:'/student',
+                method:'GET'
+            }).then((res)=>{
+                this.allData = res.data;
+            });
+        }
+    });
+
+    $(function () {
+
+    });
+</script>
+</body>
+</html>
